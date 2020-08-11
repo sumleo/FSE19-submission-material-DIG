@@ -1,19 +1,19 @@
 /**
  * Copyright (C) 2010-2016 Gordon Fraser, Andrea Arcuri and EvoSuite
  * contributors
- *
+ * <p>
  * This file is part of EvoSuite.
- *
+ * <p>
  * EvoSuite is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3.0 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * EvoSuite is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public
  * License along with EvoSuite. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  * <p>
  * TestSuiteMinimizer class.
  * </p>
- * 
+ *
  * @author Gordon Fraser
  */
 public class TestSuiteMinimizer {
@@ -102,19 +102,18 @@ public class TestSuiteMinimizer {
         logger.info("Minimization Strategy: " + strategy + ", " + suite.size() + " tests");
         suite.clearMutationHistory();
 
-        if (minimizePerTest){
+        if (minimizePerTest) {
 //            if(Properties.CUT_EXCEPTIONS){
 //                minimizeSeleniumTests(suite);
 //            }else{
 //                minimizeTests(suite);
 //            }
             minimizeTests(suite);
-        }
-        else{
+        } else {
             minimizeSuite(suite);
         }
-    	
-    	ClientServices.getInstance().getClientNode().trackOutputVariable(RuntimeVariable.Minimized_Size,
+
+        ClientServices.getInstance().getClientNode().trackOutputVariable(RuntimeVariable.Minimized_Size,
                 suite.size());
         ClientServices.getInstance().getClientNode().trackOutputVariable(RuntimeVariable.Minimized_Length,
                 suite.totalLengthOfTestCases());
@@ -141,14 +140,14 @@ public class TestSuiteMinimizer {
                 //logger.warn("Removing " + coveredGoals + " goals already covered by JUnit (total: " + goals + ")");
                 goals.removeAll(coveredGoals);
                 logger.info("Remaining goals: " + goals.size() + ": " + goals);
-            } catch(ClassNotFoundException e){
+            } catch (ClassNotFoundException e) {
                 LoggingUtils.getEvoLogger().warn("* Failed to find JUnit test suite: " + Properties.JUNIT);
             }
         }
     }
 
     // DO NOT USE IT
-    private void minimizeSeleniumTests(TestSuiteChromosome suite){
+    private void minimizeSeleniumTests(TestSuiteChromosome suite) {
 
         ExecutionTracer.enableTraceCalls();
 
@@ -158,7 +157,7 @@ public class TestSuiteMinimizer {
 
         TestSuiteWriter minimizedSuite = new TestSuiteWriter();
 
-        for(TestChromosome test: suite.getTestChromosomes()){
+        for (TestChromosome test : suite.getTestChromosomes()) {
             TestChromosome copy = (TestChromosome) test.clone();
 
             // execute test case to get the last exceptions
@@ -190,14 +189,14 @@ public class TestSuiteMinimizer {
                         .collect(Collectors.joining(":::"));
                 CheckCondition.checkState(executionResult.getNumberOfThrownExceptions() == 0,
                         "Minimization bug - number of thrown exceptions expected 0, found " +
-                        executionResult.getNumberOfThrownExceptions() + ". Exceptions: " + exceptions);
+                                executionResult.getNumberOfThrownExceptions() + ". Exceptions: " + exceptions);
                 copy.setLastExecutionResult(executionResult);
                 copy.setChanged(false);
             } catch (Exception e) {
                 throw new Error(e);
             }
-
-            minimizedSuite.insertTest(copy.getTestCase());
+            if (!copy.hasException())
+                minimizedSuite.insertTest(copy.getTestCase());
 
         }
 
@@ -237,7 +236,7 @@ public class TestSuiteMinimizer {
         for (TestFitnessFactory<?> ff : testFitnessFactories) {
             goals.addAll(ff.getCoverageGoals());
         }
-        
+
         filterJUnitCoveredGoals(goals);
 
         int currentGoal = 0;
@@ -254,10 +253,10 @@ public class TestSuiteMinimizer {
             updateClientStatus(numGoals > 0 ? 100 * currentGoal / numGoals : 100);
             currentGoal++;
             if (isTimeoutReached()) {
-				/*
-				 * FIXME: if timeout, this algorithm should be changed in a way that the modifications
-				 * done so far are not lost
-				 */
+                /*
+                 * FIXME: if timeout, this algorithm should be changed in a way that the modifications
+                 * done so far are not lost
+                 */
                 logger.warn("Minimization timeout. Roll back to original test suite");
                 return;
             }
@@ -298,11 +297,10 @@ public class TestSuiteMinimizer {
                         goal);
                 TestChromosome copy = (TestChromosome) test.clone();
 
-                if(Properties.CUT_EXCEPTIONS){
-                	copy = minimizer.minimizeSelenium(copy, test, test.getTestCase().getID());
-                }
-                else{
-                	minimizer.minimize(copy);
+                if (Properties.CUT_EXCEPTIONS) {
+                    copy = minimizer.minimizeSelenium(copy, test, test.getTestCase().getID());
+                } else {
+                    minimizer.minimize(copy);
                 }
 
 //                minimizer.minimize(copy);
@@ -311,7 +309,7 @@ public class TestSuiteMinimizer {
                     logger.warn("Minimization timeout. Roll back to original test suite");
                     return;
                 }
-                
+
 //                // TODO: Need proper list of covered goals
                 copy.getTestCase().clearCoveredGoals();
 
@@ -440,7 +438,7 @@ public class TestSuiteMinimizer {
                         modified = false;
                     }
 
-                    if(!modified){
+                    if (!modified) {
                         testChromosome.setChanged(false);
                         testChromosome.setTestCase(originalTestChromosome.getTestCase());
                         logger.debug("Deleting failed");
@@ -526,7 +524,7 @@ public class TestSuiteMinimizer {
         }
 
         for (TestChromosome test : tests) {
-            if(Properties.CUT_EXCEPTIONS){
+            if (Properties.CUT_EXCEPTIONS) {
                 // the test suite is minimized
                 test.getTestCase().setMinimized(true);
             }

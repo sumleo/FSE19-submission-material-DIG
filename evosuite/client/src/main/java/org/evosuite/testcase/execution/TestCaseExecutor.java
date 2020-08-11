@@ -335,7 +335,7 @@ public class TestCaseExecutor implements ThreadFactory {
 
         } catch (Exception e) {
             logger.error("TG: Exception caught: ", e);
-            throw new Error(e);
+//            throw new Error(e);
         }
 
         return result;
