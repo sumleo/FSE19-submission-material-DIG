@@ -151,11 +151,10 @@ public class CoverageManager {
             writer.write(coverageInfos.stream().map(String::valueOf).collect(Collectors.joining("\n")));
             writer.write("PARSE_BUG_HERE\n");
             LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
-            System.out.println("bugs here 2333");
             for (LogEntry entry : logEntries) {
                 String line = entry.getLevel() + "->" + entry.getMessage() + "\n";
-                writer.write(line);
-                System.out.println(line);
+                if (entry.getLevel().toString().equals("SEVERE") && entry.getMessage().contains("localhost:"))
+                    writer.write(line);
             }
             writer.flush();
             writer.close();
