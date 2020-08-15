@@ -149,7 +149,7 @@ public class CoverageManager {
             }
             Writer writer = new PrintWriter(resultFile);
             writer.write(coverageInfos.stream().map(String::valueOf).collect(Collectors.joining("\n")));
-            writer.write("PARSE_BUG_HERE\n");
+            writer.write("\nPARSE_BUG_HERE\n");
             LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
             for (LogEntry entry : logEntries) {
                 String line = entry.getLevel() + "->" + entry.getMessage() + "\n";
