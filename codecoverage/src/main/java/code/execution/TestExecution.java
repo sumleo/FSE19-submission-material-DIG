@@ -110,6 +110,7 @@ public class TestExecution {
             // one driver for each test case in the test suite
             javaClass.addMethod("@Before \n public void setup() \n{ driver = new DriverProvider().getActiveDriver(); \n }");
         }
+
         javaClass.addMethod("@AfterClass \n public static void resetCoverageStats() \n{ CoverageManager coverageManager = new CoverageManager(); \n coverageManager.resetCoverageStats(); \n ResetAppState.quitDriver(driver); \n }");
         if(withDB){
             // don't reset the driver after each test case execution
@@ -119,7 +120,7 @@ public class TestExecution {
                     + "coverageManager.sendCoverageObjectToExpressServer(coverage); \n"
                     + "String htmlCoverageReport = coverageManager.getCoverageReportFromExpressServer(); \n"
                     + "List<CoverageInfo> coverageInfos = coverageManager.parseHTMLResponse(htmlCoverageReport); \n"
-                    + "coverageManager.writeCoverageReport(coverageInfos, pathToESTestSuite); \n }");
+                    + "coverageManager.writeCoverageReport(coverageInfos, pathToESTestSuite,driver); \n }");
         }else{
             // reset the driver after each test case execution
             javaClass.addMethod("@After \n public void saveIntermediateCoverageReportAndReset() \n" +
@@ -128,7 +129,7 @@ public class TestExecution {
                     + "coverageManager.sendCoverageObjectToExpressServer(coverage); \n"
                     + "String htmlCoverageReport = coverageManager.getCoverageReportFromExpressServer(); \n"
                     + "List<CoverageInfo> coverageInfos = coverageManager.parseHTMLResponse(htmlCoverageReport); \n"
-                    + "coverageManager.writeCoverageReport(coverageInfos, pathToESTestSuite); \n "
+                    + "coverageManager.writeCoverageReport(coverageInfos, pathToESTestSuite,driver); \n "
                     + "ResetAppState.reset(driver); \n }");
         }
 

@@ -18,6 +18,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,19 +32,19 @@ import java.util.stream.Collectors;
 
 public class CoverageManager {
 
-    public CoverageManager(){
+    public CoverageManager() {
     }
 
-    public Object getCoverageObject(WebDriver driver){
+    public Object getCoverageObject(WebDriver driver) {
         JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
         Object coverage = javascriptExecutor.executeScript("return window.__coverage__;");
-        if(coverage == null){
+        if (coverage == null) {
             throw new IllegalStateException("Be sure that the application source code has been instrumented with \' istanbul instrument \'");
         }
         return coverage;
     }
 
-    public void sendCoverageObjectToExpressServer(Object coverage){
+    public void sendCoverageObjectToExpressServer(Object coverage) {
         try {
             HttpRequestFactory requestFactory
                     = new NetHttpTransport().createRequestFactory();
@@ -61,7 +64,7 @@ public class CoverageManager {
         }
     }
 
-    public String getCoverageReportFromExpressServer(){
+    public String getCoverageReportFromExpressServer() {
         try {
             HttpRequestFactory requestFactory
                     = new NetHttpTransport().createRequestFactory();
@@ -81,7 +84,7 @@ public class CoverageManager {
         }
     }
 
-    public void resetCoverageStats(){
+    public void resetCoverageStats() {
         try {
             HttpRequestFactory requestFactory
                     = new NetHttpTransport().createRequestFactory();
@@ -102,7 +105,7 @@ public class CoverageManager {
         }
     }
 
-    public List<CoverageInfo> parseHTMLResponse(String html){
+    public List<CoverageInfo> parseHTMLResponse(String html) {
         Document doc = Jsoup.parse(html);
         Element coverageSummaryContainer = doc.select("div.clearfix").first();
         Elements children = coverageSummaryContainer.children();
@@ -111,15 +114,15 @@ public class CoverageManager {
                     CoverageInfo coverageInfo = new CoverageInfo();
                     for (int i = 0; i < element.children().size(); i++) {
                         Element span = element.child(i);
-                        if(span.hasText()){
-                            if(i == 0){ //percentage
+                        if (span.hasText()) {
+                            if (i == 0) { //percentage
                                 String percentage = span.text();
                                 String doublePercentage = percentage.replace("%", "").trim(); //trim remove white spaces before and after the string
                                 coverageInfo.setPercentage(Double.valueOf(doublePercentage));
-                            }else if(i == 1){ //name
+                            } else if (i == 1) { //name
                                 String name = span.text();
                                 coverageInfo.setName(name.trim());
-                            }else if(i == 2){ //fraction
+                            } else if (i == 2) { //fraction
                                 String fraction = span.text().trim();
                                 String numDen[] = fraction.split("/");
                                 String num = numDen[0];
@@ -136,16 +139,24 @@ public class CoverageManager {
         return coverageInfos;
     }
 
-    public void writeCoverageReport(List<CoverageInfo> coverageInfos, String pathToESTestSuite){
+    public void writeCoverageReport(List<CoverageInfo> coverageInfos, String pathToESTestSuite, WebDriver driver) {
         try {
             int counter = 0;
             File resultFile = new File(pathToESTestSuite + "/coverage-report" + counter + ".txt");
-            while(resultFile.exists()){
+            while (resultFile.exists()) {
                 resultFile = new File(pathToESTestSuite + "/coverage-report" + counter + ".txt");
                 counter++;
             }
             Writer writer = new PrintWriter(resultFile);
             writer.write(coverageInfos.stream().map(String::valueOf).collect(Collectors.joining("\n")));
+            writer.write("PARSE_BUG_HERE\n");
+            LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+            System.out.println("bugs here 2333");
+            for (LogEntry entry : logEntries) {
+                String line = entry.getLevel() + "->" + entry.getMessage() + "\n";
+                writer.write(line);
+                System.out.println(line);
+            }
             writer.flush();
             writer.close();
         } catch (IOException e) {
@@ -153,7 +164,7 @@ public class CoverageManager {
         }
     }
 
-    public void writeCoverageReport(List<CoverageInfo> coverageInfos, String pathToESTestSuite, int indexOfCoverageReport){
+    public void writeCoverageReport(List<CoverageInfo> coverageInfos, String pathToESTestSuite, int indexOfCoverageReport) {
         try {
             Writer writer = new PrintWriter(new File(pathToESTestSuite) + "/coverage-report" + indexOfCoverageReport + ".txt");
             writer.write(coverageInfos.stream().map(String::valueOf).collect(Collectors.joining("\n")));
@@ -165,20 +176,21 @@ public class CoverageManager {
     }
 
     private void parseOkResponse(HttpResponse httpResponse) throws IOException {
-        try{
+        try {
             String rawResponse = httpResponse.parseAsString();
-            Type okMessageType = new TypeToken<OkMessage>() {}.getType();
+            Type okMessageType = new TypeToken<OkMessage>() {
+            }.getType();
             Gson gson = new Gson();
             OkMessage okMessage = gson.fromJson(rawResponse, okMessageType);
-            if(!okMessage.getOk().equals("true")){
+            if (!okMessage.getOk().equals("true")) {
                 throw new IllegalStateException("Response message is not as expected! Expected \'{\"ok\":true}\' found " + rawResponse);
             }
-        }finally {
+        } finally {
             httpResponse.disconnect();
         }
     }
 
-    private static class OkMessage{
+    private static class OkMessage {
 
         private String ok;
 
