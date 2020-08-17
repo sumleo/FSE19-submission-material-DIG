@@ -322,7 +322,7 @@ public class AllMethodsTestChromosomeFactory implements ChromosomeFactory<TestCh
             //now immutable test call: check new random test case at test suite level if it calls the factory again
             //if that is the case it should be better to generate a random test case which covers the remain test calls
             //yet uncovered
-            //logger.debug("@@@methodName chose: " + methodName);
+            logger.info("@@@methodName chose: " + methodName);
 
             GenericAccessibleObject<?> call = GraphParser.findRightImmutableMethodCall(methodName);
 
