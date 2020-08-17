@@ -336,7 +336,7 @@ public class AllMethodsTestChromosomeFactory implements ChromosomeFactory<TestCh
                         logger.info(test.toCode());
                         testFactory.addMethod(test, (GenericMethod) call, test.size(), 0);
                         firstMethodToAdd = false;
-                    } else if (call.isMethod()) {
+                    } else if (call.isMethod() && test.size() > 0) {
                         GenericMethod method = (GenericMethod) call;
                         ConstructorStatement cStmt = (ConstructorStatement) test.getStatement(0);
                         VariableReference cStmtVar = cStmt.getReturnValue();
