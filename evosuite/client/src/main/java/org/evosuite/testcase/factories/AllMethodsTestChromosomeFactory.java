@@ -345,7 +345,6 @@ public class AllMethodsTestChromosomeFactory implements ChromosomeFactory<TestCh
                             logger.info(test.getStatement(testLength).getCode());
                         testFactory.addMethod(test, (GenericMethod) call, test.size(), 0);
                         firstMethodToAdd = false;
-                        i++;
                     } else if (call.isMethod()) {
                         logger.info("in second");
                         logger.info("Debug Call", call.getName());
@@ -364,12 +363,12 @@ public class AllMethodsTestChromosomeFactory implements ChromosomeFactory<TestCh
                         ConstructorStatement cStmt = (ConstructorStatement) test.getStatement(0);
                         VariableReference cStmtVar = cStmt.getReturnValue();
                         testFactory.addMethodFor(test, cStmtVar, method, test.size());
-                        i++;
                     }
                 } catch (ConstructionFailedException e) {
                 }
             }
             num++;
+            i++;
         }
         if (logger.isDebugEnabled())
             logger.debug("@@@@Randomized path sequence test case:" + test.toCode());
