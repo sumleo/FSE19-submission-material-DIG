@@ -345,7 +345,7 @@ public class AllMethodsTestChromosomeFactory implements ChromosomeFactory<TestCh
                             logger.info(test.getStatement(testLength).getCode());
                         testFactory.addMethod(test, (GenericMethod) call, test.size(), 0);
                         firstMethodToAdd = false;
-                    } else if (call.isMethod() && test.size() > 0) {
+                    } else if (call.isMethod()) {
                         logger.info("in second");
                         logger.info("Debug Call", call.getName());
                         logger.info(call.toString());
@@ -365,6 +365,8 @@ public class AllMethodsTestChromosomeFactory implements ChromosomeFactory<TestCh
                         testFactory.addMethodFor(test, cStmtVar, method, test.size());
                     }
                 } catch (ConstructionFailedException e) {
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
                 }
             }
             num++;
