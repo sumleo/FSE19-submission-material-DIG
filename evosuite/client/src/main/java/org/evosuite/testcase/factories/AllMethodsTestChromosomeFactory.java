@@ -330,13 +330,35 @@ public class AllMethodsTestChromosomeFactory implements ChromosomeFactory<TestCh
                 try {
                     TestFactory testFactory = TestFactory.getInstance();
                     if (call.isMethod() && firstMethodToAdd) {
-                        logger.info("DebugCall", call.toString(), call.getName());
+                        logger.info("in first");
+                        logger.info("Debug Call", call.getName());
+                        logger.info(call.toString());
+                        logger.info(call.getName());
                         logger.info("Debug Method");
                         logger.info(String.valueOf(test.size()));
-                        logger.info(test.toCode());
+                        logger.info("i");
+                        logger.info(String.valueOf(i));
+                        logger.info("num");
+                        logger.info(String.valueOf(num));
+                        logger.info("Debug Stmts");
+                        for (int testLength = 0; testLength < test.size(); testLength++)
+                            logger.info(test.getStatement(testLength).getCode());
                         testFactory.addMethod(test, (GenericMethod) call, test.size(), 0);
                         firstMethodToAdd = false;
                     } else if (call.isMethod() && test.size() > 0) {
+                        logger.info("in second");
+                        logger.info("Debug Call", call.getName());
+                        logger.info(call.toString());
+                        logger.info(call.getName());
+                        logger.info("Debug Method");
+                        logger.info(String.valueOf(test.size()));
+                        logger.info("i");
+                        logger.info(String.valueOf(i));
+                        logger.info("num");
+                        logger.info(String.valueOf(num));
+                        logger.info("Debug Stmts");
+                        for (int testLength = 0; testLength < test.size(); testLength++)
+                            logger.info(test.getStatement(testLength).getCode());
                         GenericMethod method = (GenericMethod) call;
                         ConstructorStatement cStmt = (ConstructorStatement) test.getStatement(0);
                         VariableReference cStmtVar = cStmt.getReturnValue();
